@@ -35,7 +35,7 @@ CREATE TABLE staging_events (
     session_id int nut null,
     song varchar(50),
     status int not null,
-    ts BIGINT not null，
+    ts timestamp not null，
     user_agent text not null,
     user_id int,
     primary key(event_id)
@@ -46,7 +46,7 @@ staging_songs_table_create = ("""
 CREATE staging_songs(
     song_id  varchar(25) not null,
     num_songs int not bull,
-    artist_id varchar(25) not null,
+    artist_id varchar(25),
     artist_latitude float,
     artist_longitude float,
     artist_loaction varchar(50),
@@ -106,8 +106,8 @@ artist_table_create = ("""
 """)
 
 time_table_create = ("""
-    CREATE TABLE times(
-        start_time BIGINT,  
+    CREATE TABLE time(
+        start_time TIMESTAMP,  
         hour int, 
         day int, 
         week int, 
@@ -137,23 +137,54 @@ staging_songs_copy = ("""
 songplay_table_insert = ("""
     INSERT INTO songplays( start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
     SELECT 
+    DATE_FORMAT(FROM_UNIXTIME(`e.ts`), '%Y-%m-%d %H:%i:%s') as start_time, 
+    e.user_id, 
+    e.level, 
+    s.song_id,
+    s.session_id,
+    e.location, 
+    e.user_agent
+    FROM staging_event e,
+    JOIN staging_songs s ON e.song=s.title
+    AND e.artist=s.artist_name 
+    AND e.length=s.duration; 
 
 """)
 
 user_table_insert = ("""
-    INSERT INTO users(user_id, first_name, last_name, gender, level)
+    INSERT INTO users(user_id, first_name, last_name, gender, level) 
+    SELECT user_id, first_name,last_name,gender,level
+    FROM staging_event 
+    WHERE user_id IS NOT NULL
+
 """)
 
 song_table_insert = ("""
     INSERT INTO songs(song_id, title, artist_id, year, duration)
+    SELECT song_id,title,artist_id, year,duration 
+    FROM staging_songs
+    WHERE song_id IS NOT NULL
 """)
 
 artist_table_insert = ("""
-    INSERT INTO artists(artist_id, name, location, latitude, longitude)
+    INSERT INTO artists(artist_id, name, location, latitude, longitude
+    SELECT artist_id,artist_name,artist_location,artist_latitude,artist_longitude
+    FROM staging_songs
+    WHERE artist_id IS NOT NULL
 """)
 
 time_table_insert = ("""
-    INSERT INTO times(start_time, hour, day, week, month, year, weekday)
+    INSERT INTO time(start_time, hour, day, week, month, year, weekday)
+    SELECT DATE_FORMAT(FROM_UNIXTIME(`ts`), '%Y-%m-%d %H:%i:%s') as start_time,
+    extract (hour from start_time),
+    extract (day from start_time),
+    extract (week from start_time),
+    extract (month from start_time),
+    extract (year from start_time),
+    extract (hour from start_time),
+    extract (isodow from start_time),
+    FROM staging_event
+
 """)
 
 # QUERY LISTS
