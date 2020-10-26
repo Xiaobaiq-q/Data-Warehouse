@@ -19,7 +19,13 @@ time_table_drop = "DROP TABLE IF EXISTS time_table"
 
 staging_events_table_create= ("""
 CREATE TABLE staging_events (
-    event_id 
+    event_id INT IDENTITY(0,1),
+    artist varchar(100),
+    auth varchar(10),
+    fisrt_name varchar(25),
+    gender varchar(10),
+    item_in_session
+    
 """)
 
 staging_songs_table_create = ("""
@@ -88,10 +94,16 @@ time_table_create = ("""
 # STAGING TABLES
 
 staging_events_copy = ("""
-""").format()
+    copy staging_events from {}
+    iam_role {}
+    format as json 'auto'
+""").format(config.get('S3','LOG_DATA'),config.get('IAM_ROLE','ARN'))
 
 staging_songs_copy = ("""
-""").format()
+    copy staging_events from {}
+    iam_role {}
+    format as json 'auto'
+""").format(config.get('S3','SONG_DATA'),config.get('IAM_ROLE','ARN'))
 
 # FINAL TABLES
 
