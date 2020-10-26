@@ -19,16 +19,43 @@ time_table_drop = "DROP TABLE IF EXISTS time_table"
 
 staging_events_table_create= ("""
 CREATE TABLE staging_events (
-    event_id INT IDENTITY(0,1),
+    event_id INT IDENTITY(0,1) not null,
     artist varchar(100),
-    auth varchar(10),
-    fisrt_name varchar(25),
-    gender varchar(10),
-    item_in_session
-    
+    auth varchar(10) not null,
+    fisrt_name varchar(25) not null,
+    gender varchar(10) not null,
+    item_in_session int not null,
+    last_name varchar(25) not null,
+    length float not null,
+    level varchar(10) not null,
+    location varchar(50) not null,
+    method varchar(10) not null,
+    page varchar(10) not null,
+    registration varchar(25) not null,
+    session_id int nut null,
+    song varchar(50),
+    status int not null,
+    ts BIGINT not null，
+    user_agent text not null,
+    user_id int,
+    primary key(event_id)
+    );   
 """)
 
 staging_songs_table_create = ("""
+CREATE staging_songs(
+    song_id  varchar(25) not null,
+    num_songs int not bull,
+    artist_id varchar(25) not null,
+    artist_latitude float,
+    artist_longitude float,
+    artist_loaction varchar(50),
+    artist_name varchar(25),
+    title  varcahr(50) not null,
+    duaration float not null,
+    year int,
+    primary key (song_id)
+);
 """)
 
 songplay_table_create = ("""
@@ -109,6 +136,7 @@ staging_songs_copy = ("""
 
 songplay_table_insert = ("""
     INSERT INTO songplays( start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
+    SELECT 
 
 """)
 
