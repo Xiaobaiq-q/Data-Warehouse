@@ -60,11 +60,11 @@ CREATE TABLE staging_songs(
 songplay_table_create = ("""
 CREATE TABLE songplays(
     songplay_id INT IDENTITY(0,1),
-    start_time  TIMESTAMP, 
-    user_id varchar(100), 
+    start_time  TIMESTAMP not null, 
+    user_id varchar(100) not null, 
     level varchar(50), 
-    song_id varchar(100),
-    artist_id varchar(100),
+    song_id varchar(100) not null,
+    artist_id varchar(100) not null,
     session_id BIGINT, 
     location varchar(255), 
     user_agent  text,
@@ -86,7 +86,7 @@ song_table_create = ("""
     CREATE TABLE songs(
         song_id varchar(100), 
         title varchar(255),
-        artist_id varchar(100), 
+        artist_id varchar(100) not null, 
         year int, 
         duration DOUBLE PRECISION,
         primary key(song_id)
